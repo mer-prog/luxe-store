@@ -88,25 +88,25 @@ export function ProductForm({ product, categories, onSuccess }: ProductFormProps
 
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <Label htmlFor="price">Price</Label>
+          <Label htmlFor="price">Price ($)</Label>
           <Input
             id="price"
             name="price"
             type="number"
             step="0.01"
-            defaultValue={product?.price}
+            defaultValue={product?.price ? (product.price / 100).toFixed(2) : ""}
             required
             className="mt-1"
           />
         </div>
         <div>
-          <Label htmlFor="compareAtPrice">Compare At Price</Label>
+          <Label htmlFor="compareAtPrice">Compare At Price ($)</Label>
           <Input
             id="compareAtPrice"
             name="compareAtPrice"
             type="number"
             step="0.01"
-            defaultValue={product?.compareAtPrice || ""}
+            defaultValue={product?.compareAtPrice ? (product.compareAtPrice / 100).toFixed(2) : ""}
             className="mt-1"
           />
         </div>

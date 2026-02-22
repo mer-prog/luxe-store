@@ -1,18 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { formatPrice } from "@/lib/utils";
 import { TAX_RATE } from "@/lib/constants";
-import { placeOrder } from "@/lib/actions/checkout";
+import { Lock } from "lucide-react";
 import type { CartWithItems } from "@/types";
 
 export function CheckoutForm({ cart }: { cart: CartWithItems }) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -20,87 +16,61 @@ export function CheckoutForm({ cart }: { cart: CartWithItems }) {
     (sum, item) => sum + item.product.price * item.quantity,
     0
   );
-  const tax = subtotal * TAX_RATE;
+  const tax = Math.round(subtotal * TAX_RATE);
   const total = subtotal + tax;
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleCheckout = async () => {
     setLoading(true);
     setError("");
 
-    const result = await placeOrder(formData);
+    try {
+      const res = await fetch("/api/checkout", { method: "POST" });
+      const data = await res.json();
 
-    if (result.error) {
-      setError(result.error);
+      if (!res.ok) {
+        setError(data.error || "Something went wrong");
+        setLoading(false);
+        return;
+      }
+
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
+    } catch {
+      setError("Failed to connect to payment service");
       setLoading(false);
-      return;
     }
-
-    router.push(`/checkout?success=true&orderId=${result.orderId}`);
   };
 
   return (
     <div className="grid gap-10 lg:grid-cols-2">
-      <form action={handleSubmit} className="space-y-6">
-        <h2 className="font-serif text-2xl">Shipping Information</h2>
+      <div className="space-y-6">
+        <h2 className="font-serif text-2xl">Payment</h2>
 
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="shippingAddress">Address</Label>
-            <Input
-              id="shippingAddress"
-              name="shippingAddress"
-              placeholder="123 Main Street"
-              required
-              className="mt-1"
-            />
+        <p className="text-muted-foreground">
+          You will be redirected to Stripe to securely complete your payment and
+          enter shipping details.
+        </p>
+
+        {error && (
+          <div className="rounded-md border border-red-200 bg-red-50 p-4">
+            <p className="text-sm text-red-600">{error}</p>
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="shippingCity">City</Label>
-              <Input
-                id="shippingCity"
-                name="shippingCity"
-                placeholder="New York"
-                required
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="shippingZip">ZIP Code</Label>
-              <Input
-                id="shippingZip"
-                name="shippingZip"
-                placeholder="10001"
-                required
-                className="mt-1"
-              />
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="shippingCountry">Country</Label>
-            <Input
-              id="shippingCountry"
-              name="shippingCountry"
-              placeholder="United States"
-              required
-              className="mt-1"
-            />
-          </div>
-        </div>
-
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        )}
 
         <Button
-          type="submit"
+          onClick={handleCheckout}
           disabled={loading}
           className="w-full h-12 uppercase tracking-wider"
           size="lg"
         >
-          {loading ? "Placing Order..." : "Place Order"}
+          <Lock className="mr-2 h-4 w-4" />
+          {loading ? "Redirecting..." : "Proceed to Payment"}
         </Button>
-      </form>
+
+        <p className="text-center text-xs text-muted-foreground">
+          Payments are processed securely by Stripe
+        </p>
+      </div>
 
       <div className="rounded-lg border bg-neutral-50 p-6">
         <h2 className="font-serif text-lg">Order Summary</h2>

@@ -1,10 +1,11 @@
-import { PrismaClient, Role, OrderStatus } from "@prisma/client";
+import { PrismaClient, Role, OrderStatus, PaymentStatus } from "@prisma/client";
 import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
   // Clean existing data
+  await prisma.shippingAddress.deleteMany();
   await prisma.review.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
@@ -85,7 +86,7 @@ async function main() {
     }),
   ]);
 
-  // Create products
+  // Create products (prices in cents: $28.90 = 2890 cents)
   const productsData = [
     // Outerwear (4 products)
     {
@@ -93,8 +94,8 @@ async function main() {
       slug: "cashmere-overcoat",
       description:
         "A masterfully tailored overcoat in pure Italian cashmere. Features a notched lapel, concealed button closure, and silk lining. The epitome of winter luxury.",
-      price: 2890,
-      compareAtPrice: 3200,
+      price: 289000,
+      compareAtPrice: 320000,
       images: ["/images/products/product-01.jpg"],
       sizes: ["S", "M", "L", "XL"],
       categoryId: categories[0].id,
@@ -106,7 +107,7 @@ async function main() {
       slug: "wool-blend-trench",
       description:
         "Classic double-breasted trench coat in a premium wool-cashmere blend. Storm flap, epaulettes, and belted waist create a silhouette of refined authority.",
-      price: 1950,
+      price: 195000,
       compareAtPrice: null,
       images: ["/images/products/product-02.jpg"],
       sizes: ["S", "M", "L", "XL"],
@@ -119,8 +120,8 @@ async function main() {
       slug: "leather-moto-jacket",
       description:
         "Hand-stitched lambskin leather jacket with asymmetric zip closure. Quilted panels and antique brass hardware add an edge to this timeless piece.",
-      price: 2450,
-      compareAtPrice: 2800,
+      price: 245000,
+      compareAtPrice: 280000,
       images: ["/images/products/product-03.jpg"],
       sizes: ["S", "M", "L"],
       categoryId: categories[0].id,
@@ -132,7 +133,7 @@ async function main() {
       slug: "down-puffer-vest",
       description:
         "Lightweight yet incredibly warm goose down vest with a matte shell finish. Channel quilting and stand collar for understated winter elegance.",
-      price: 890,
+      price: 89000,
       compareAtPrice: null,
       images: ["/images/products/product-04.jpg"],
       sizes: ["S", "M", "L", "XL"],
@@ -146,8 +147,8 @@ async function main() {
       slug: "silk-blend-blazer",
       description:
         "Impeccably structured blazer in a luxurious silk-wool blend. Peak lapels, functioning cuff buttons, and a half-canvas construction define this statement piece.",
-      price: 1680,
-      compareAtPrice: 1900,
+      price: 168000,
+      compareAtPrice: 190000,
       images: ["/images/products/product-05.jpg"],
       sizes: ["S", "M", "L", "XL"],
       categoryId: categories[1].id,
@@ -159,7 +160,7 @@ async function main() {
       slug: "merino-wool-turtleneck",
       description:
         "Ultra-fine merino wool turtleneck with a relaxed fit. Ribbed cuffs and hem, finished with a seamless construction for unparalleled comfort.",
-      price: 420,
+      price: 42000,
       compareAtPrice: null,
       images: ["/images/products/product-06.jpg"],
       sizes: ["XS", "S", "M", "L", "XL"],
@@ -172,8 +173,8 @@ async function main() {
       slug: "linen-camp-collar-shirt",
       description:
         "Relaxed-fit camp collar shirt in washed Belgian linen. Mother-of-pearl buttons and a box pleat back add subtle refinement to this resort essential.",
-      price: 380,
-      compareAtPrice: 450,
+      price: 38000,
+      compareAtPrice: 45000,
       images: ["/images/products/product-07.jpg"],
       sizes: ["S", "M", "L", "XL"],
       categoryId: categories[1].id,
@@ -185,7 +186,7 @@ async function main() {
       slug: "cashmere-v-neck-sweater",
       description:
         "Lightweight cashmere sweater with a classic V-neck. Fully fashioned construction ensures a perfect drape that elevates any outfit.",
-      price: 590,
+      price: 59000,
       compareAtPrice: null,
       images: ["/images/products/product-08.jpg"],
       sizes: ["S", "M", "L", "XL"],
@@ -199,7 +200,7 @@ async function main() {
       slug: "tailored-wool-trousers",
       description:
         "Sharp flat-front trousers in Super 130s wool. Half-lined with a mid-rise fit and tapered leg. Perfect for the boardroom or an evening out.",
-      price: 680,
+      price: 68000,
       compareAtPrice: null,
       images: ["/images/products/product-09.jpg"],
       sizes: ["28", "30", "32", "34", "36"],
@@ -212,8 +213,8 @@ async function main() {
       slug: "japanese-selvedge-denim",
       description:
         "Premium Japanese selvedge denim with a slim-straight fit. Raw indigo wash with subtle fading. Chain-stitched hems and copper rivets throughout.",
-      price: 420,
-      compareAtPrice: 480,
+      price: 42000,
+      compareAtPrice: 48000,
       images: ["/images/products/product-10.jpg"],
       sizes: ["28", "30", "32", "34", "36"],
       categoryId: categories[2].id,
@@ -225,7 +226,7 @@ async function main() {
       slug: "pleated-wide-leg-pants",
       description:
         "Elegantly pleated wide-leg trousers in a fluid crepe fabric. High waist with a flowing silhouette that moves beautifully with every step.",
-      price: 520,
+      price: 52000,
       compareAtPrice: null,
       images: ["/images/products/product-11.jpg"],
       sizes: ["XS", "S", "M", "L"],
@@ -238,8 +239,8 @@ async function main() {
       slug: "cotton-chinos",
       description:
         "Garment-dyed cotton chinos with a broken-in softness. Slim fit through the thigh with a clean taper. The perfect balance of casual and polished.",
-      price: 290,
-      compareAtPrice: 340,
+      price: 29000,
+      compareAtPrice: 34000,
       images: ["/images/products/product-12.jpg"],
       sizes: ["28", "30", "32", "34", "36"],
       categoryId: categories[2].id,
@@ -252,7 +253,7 @@ async function main() {
       slug: "italian-leather-oxford",
       description:
         "Hand-burnished calfskin Oxford shoes with Goodyear welt construction. Blake-stitched leather sole and hand-painted patina for a truly bespoke feel.",
-      price: 1250,
+      price: 125000,
       compareAtPrice: null,
       images: ["/images/products/product-13.jpg"],
       sizes: ["40", "41", "42", "43", "44", "45"],
@@ -265,8 +266,8 @@ async function main() {
       slug: "suede-chelsea-boots",
       description:
         "Sleek Chelsea boots in butter-soft Italian suede. Elastic side panels, pull tab, and a stacked leather heel. From street to soirée.",
-      price: 890,
-      compareAtPrice: 1050,
+      price: 89000,
+      compareAtPrice: 105000,
       images: ["/images/products/product-14.jpg"],
       sizes: ["40", "41", "42", "43", "44", "45"],
       categoryId: categories[3].id,
@@ -278,7 +279,7 @@ async function main() {
       slug: "minimalist-leather-sneaker",
       description:
         "Clean-lined sneakers in full-grain Nappa leather. Margom rubber outsole and memory foam insole. The luxury approach to everyday footwear.",
-      price: 560,
+      price: 56000,
       compareAtPrice: null,
       images: ["/images/products/product-15.jpg"],
       sizes: ["40", "41", "42", "43", "44", "45"],
@@ -291,8 +292,8 @@ async function main() {
       slug: "woven-leather-loafers",
       description:
         "Intricately hand-woven leather loafers with a flexible Blake construction. Leather lined with a padded insole for all-day refinement.",
-      price: 780,
-      compareAtPrice: 920,
+      price: 78000,
+      compareAtPrice: 92000,
       images: ["/images/products/product-16.jpg"],
       sizes: ["40", "41", "42", "43", "44"],
       categoryId: categories[3].id,
@@ -305,7 +306,7 @@ async function main() {
       slug: "leather-weekend-bag",
       description:
         "Full-grain vegetable-tanned leather weekend bag with brass hardware. Cotton twill lining, multiple interior pockets, and adjustable shoulder strap.",
-      price: 1450,
+      price: 145000,
       compareAtPrice: null,
       images: ["/images/products/product-17.jpg"],
       sizes: ["ONE SIZE"],
@@ -318,8 +319,8 @@ async function main() {
       slug: "cashmere-scarf",
       description:
         "Generously sized scarf in 100% Mongolian cashmere. Delicate fringe edges and an impossibly soft hand feel. Available in timeless neutral tones.",
-      price: 320,
-      compareAtPrice: 380,
+      price: 32000,
+      compareAtPrice: 38000,
       images: ["/images/products/product-18.jpg"],
       sizes: ["ONE SIZE"],
       categoryId: categories[4].id,
@@ -331,7 +332,7 @@ async function main() {
       slug: "titanium-sunglasses",
       description:
         "Lightweight titanium frame sunglasses with Carl Zeiss polarized lenses. Japanese-made with spring hinges and an anti-reflective coating.",
-      price: 680,
+      price: 68000,
       compareAtPrice: null,
       images: ["/images/products/product-19.jpg"],
       sizes: ["ONE SIZE"],
@@ -344,8 +345,8 @@ async function main() {
       slug: "italian-leather-belt",
       description:
         "Hand-finished calfskin belt with a brushed palladium buckle. Edge-painted and stitched by hand in Florence. The quintessential luxury accessory.",
-      price: 290,
-      compareAtPrice: 340,
+      price: 29000,
+      compareAtPrice: 34000,
       images: ["/images/products/product-20.jpg"],
       sizes: ["85", "90", "95", "100", "105"],
       categoryId: categories[4].id,
@@ -439,7 +440,7 @@ async function main() {
   // Create orders (one per status)
   const statuses: OrderStatus[] = [
     OrderStatus.PENDING,
-    OrderStatus.PROCESSING,
+    OrderStatus.CONFIRMED,
     OrderStatus.SHIPPED,
     OrderStatus.DELIVERED,
     OrderStatus.CANCELLED,
@@ -452,10 +453,14 @@ async function main() {
       0
     );
 
+    const orderNumber = `LUXE-20260222-${String(i + 1).padStart(3, "0")}`;
+
     await prisma.order.create({
       data: {
         userId: customer.id,
+        orderNumber,
         status: statuses[i],
+        paymentStatus: statuses[i] === OrderStatus.CANCELLED ? PaymentStatus.EXPIRED : PaymentStatus.PAID,
         total,
         shippingAddress: `${123 + i} Fifth Avenue`,
         shippingCity: "New York",

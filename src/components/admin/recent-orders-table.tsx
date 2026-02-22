@@ -27,7 +27,7 @@ export function RecentOrdersTable({ orders }: { orders: OrderWithUser[] }) {
           {orders.map((order) => (
             <TableRow key={order.id}>
               <TableCell className="font-mono text-xs">
-                {order.id.slice(0, 8)}...
+                {order.orderNumber || `${order.id.slice(0, 8)}...`}
               </TableCell>
               <TableCell>{order.user.name}</TableCell>
               <TableCell className="text-sm">
