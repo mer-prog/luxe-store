@@ -27,7 +27,7 @@ export function OrderList({ orders }: { orders: OrderWithItems[] }) {
                 {formatDate(order.createdAt)}
               </p>
               <p className="mt-1 font-mono text-xs text-muted-foreground">
-                {order.id}
+                {order.orderNumber || order.id}
               </p>
             </div>
             <div className="flex items-center gap-4">

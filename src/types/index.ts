@@ -7,9 +7,10 @@ import type {
   Order,
   OrderItem,
   Review,
+  ShippingAddress,
 } from "@prisma/client";
 
-export type { User, Product, Category, Cart, CartItem, Order, OrderItem, Review };
+export type { User, Product, Category, Cart, CartItem, Order, OrderItem, Review, ShippingAddress };
 
 export type ProductWithCategory = Product & {
   category: Category;

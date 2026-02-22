@@ -46,12 +46,13 @@ export async function createProduct(formData: FormData) {
     return { error: parsed.error.errors[0].message };
   }
 
-  const { images, sizes, compareAtPrice, ...rest } = parsed.data;
+  const { images, sizes, compareAtPrice, price, ...rest } = parsed.data;
 
   await prisma.product.create({
     data: {
       ...rest,
-      compareAtPrice: compareAtPrice ?? null,
+      price: Math.round(price * 100),
+      compareAtPrice: compareAtPrice ? Math.round(compareAtPrice * 100) : null,
       images: images.split(",").map((s) => s.trim()),
       sizes: sizes.split(",").map((s) => s.trim()),
     },
@@ -82,13 +83,14 @@ export async function updateProduct(id: string, formData: FormData) {
     return { error: parsed.error.errors[0].message };
   }
 
-  const { images, sizes, compareAtPrice, ...rest } = parsed.data;
+  const { images, sizes, compareAtPrice, price, ...rest } = parsed.data;
 
   await prisma.product.update({
     where: { id },
     data: {
       ...rest,
-      compareAtPrice: compareAtPrice ?? null,
+      price: Math.round(price * 100),
+      compareAtPrice: compareAtPrice ? Math.round(compareAtPrice * 100) : null,
       images: images.split(",").map((s) => s.trim()),
       sizes: sizes.split(",").map((s) => s.trim()),
     },

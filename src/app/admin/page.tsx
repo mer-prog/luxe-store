@@ -60,7 +60,7 @@ export default async function AdminDashboardPage() {
     const [, monthIndex] = key.split("-");
     return {
       month: months[parseInt(monthIndex)],
-      revenue: Math.round(revenue * 100) / 100,
+      revenue: Math.round(revenue),
     };
   });
 

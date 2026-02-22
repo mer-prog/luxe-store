@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -9,8 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { OrderStatusBadge } from "@/components/orders/order-status-badge";
 import { OrderStatusSelect } from "./order-status-select";
+import { PaymentStatusBadge } from "@/components/orders/payment-status-badge";
 import { formatPrice, formatDate } from "@/lib/utils";
 import type { OrderWithUser } from "@/types";
 
@@ -20,11 +19,12 @@ export function OrderTable({ orders }: { orders: OrderWithUser[] }) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Order ID</TableHead>
+            <TableHead>Order</TableHead>
             <TableHead>Customer</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Items</TableHead>
             <TableHead>Total</TableHead>
+            <TableHead>Payment</TableHead>
             <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
@@ -32,7 +32,7 @@ export function OrderTable({ orders }: { orders: OrderWithUser[] }) {
           {orders.map((order) => (
             <TableRow key={order.id}>
               <TableCell className="font-mono text-xs">
-                {order.id.slice(0, 8)}...
+                {order.orderNumber || `${order.id.slice(0, 8)}...`}
               </TableCell>
               <TableCell>
                 <div>
@@ -46,6 +46,9 @@ export function OrderTable({ orders }: { orders: OrderWithUser[] }) {
               <TableCell>{order.items.length} items</TableCell>
               <TableCell className="font-medium">
                 {formatPrice(order.total)}
+              </TableCell>
+              <TableCell>
+                <PaymentStatusBadge status={order.paymentStatus} />
               </TableCell>
               <TableCell>
                 <OrderStatusSelect orderId={order.id} currentStatus={order.status} />

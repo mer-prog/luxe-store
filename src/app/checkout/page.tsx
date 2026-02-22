@@ -6,35 +6,12 @@ import { getCart, getCartCount } from "@/lib/actions/cart";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
-import { OrderComplete } from "@/components/checkout/order-complete";
 
-interface CheckoutPageProps {
-  searchParams: Promise<{
-    success?: string;
-    orderId?: string;
-  }>;
-}
-
-export default async function CheckoutPage({ searchParams }: CheckoutPageProps) {
+export default async function CheckoutPage() {
   const session = await auth();
   if (!session) redirect("/login");
 
-  const params = await searchParams;
-  const cartCount = await getCartCount();
-
-  if (params.success === "true" && params.orderId) {
-    return (
-      <div className="flex min-h-screen flex-col">
-        <Header cartCount={cartCount} />
-        <main className="flex-1">
-          <OrderComplete orderId={params.orderId} />
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  const cart = await getCart();
+  const [cart, cartCount] = await Promise.all([getCart(), getCartCount()]);
 
   if (!cart || cart.items.length === 0) {
     redirect("/cart");
