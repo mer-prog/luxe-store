@@ -114,7 +114,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       where: { id: orderId },
       include: {
         items: { include: { product: true } },
-        user: true,
+        user: { select: { id: true, name: true, email: true } },
       },
     });
 
