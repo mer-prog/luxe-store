@@ -25,6 +25,7 @@ export default async function CheckoutSuccessPage({
   const session = await auth();
   if (!session?.user) redirect("/login");
 
+  const userId = (session.user as Record<string, unknown>).id as string;
   const params = await searchParams;
   if (!params.session_id) redirect("/orders");
 
@@ -38,7 +39,7 @@ export default async function CheckoutSuccessPage({
     getCartCount(),
   ]);
 
-  if (!order) redirect("/orders");
+  if (!order || order.userId !== userId) redirect("/orders");
 
   return (
     <div className="flex min-h-screen flex-col">

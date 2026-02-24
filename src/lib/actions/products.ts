@@ -6,15 +6,15 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 
 const productSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  slug: z.string().min(1, "Slug is required"),
-  description: z.string().min(1, "Description is required"),
-  price: z.coerce.number().positive("Price must be positive"),
-  compareAtPrice: z.coerce.number().positive().nullable().optional(),
-  images: z.string().min(1, "At least one image is required"),
-  sizes: z.string().min(1, "At least one size is required"),
-  categoryId: z.string().min(1, "Category is required"),
-  stock: z.coerce.number().int().min(0, "Stock must be non-negative"),
+  name: z.string().min(1, "Name is required").max(200, "Name is too long"),
+  slug: z.string().min(1, "Slug is required").max(200, "Slug is too long"),
+  description: z.string().min(1, "Description is required").max(5000, "Description is too long"),
+  price: z.coerce.number().positive("Price must be positive").max(99999999, "Price is too high"),
+  compareAtPrice: z.coerce.number().positive().max(99999999).nullable().optional(),
+  images: z.string().min(1, "At least one image is required").max(2000, "Too many images"),
+  sizes: z.string().min(1, "At least one size is required").max(500, "Too many sizes"),
+  categoryId: z.string().min(1, "Category is required").max(100),
+  stock: z.coerce.number().int().min(0, "Stock must be non-negative").max(999999, "Stock is too high"),
   featured: z.boolean().optional().default(false),
 });
 

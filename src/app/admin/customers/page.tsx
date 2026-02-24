@@ -6,7 +6,12 @@ import { CustomerTable } from "@/components/admin/customer-table";
 export default async function AdminCustomersPage() {
   const customers = await prisma.user.findMany({
     where: { role: "CUSTOMER" },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true,
       orders: true,
       _count: { select: { orders: true } },
     },

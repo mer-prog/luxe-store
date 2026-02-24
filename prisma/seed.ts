@@ -15,14 +15,16 @@ async function main() {
   await prisma.category.deleteMany();
   await prisma.user.deleteMany();
 
-  // Create users
-  const adminPassword = await hash("password123", 12);
-  const userPassword = await hash("password123", 12);
+  // Create users — credentials come from env vars (never commit real passwords)
+  const seedAdminPassword = process.env.SEED_ADMIN_PASSWORD || "admin-dev-only-" + Date.now();
+  const seedUserPassword = process.env.SEED_USER_PASSWORD || "user-dev-only-" + Date.now();
+  const adminPassword = await hash(seedAdminPassword, 12);
+  const userPassword = await hash(seedUserPassword, 12);
 
   const admin = await prisma.user.create({
     data: {
       name: "Admin",
-      email: "admin@luxe.com",
+      email: process.env.SEED_ADMIN_EMAIL || "admin@example.com",
       password: adminPassword,
       role: Role.ADMIN,
     },
@@ -31,7 +33,7 @@ async function main() {
   const customer = await prisma.user.create({
     data: {
       name: "Jane Doe",
-      email: "user@luxe.com",
+      email: process.env.SEED_USER_EMAIL || "user@example.com",
       password: userPassword,
       role: Role.CUSTOMER,
     },

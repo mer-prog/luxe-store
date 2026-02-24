@@ -40,7 +40,7 @@ export type OrderWithUser = Order & {
   })[];
 };
 
-export type CustomerWithOrders = User & {
+export type CustomerWithOrders = Omit<User, "password"> & {
   orders: Order[];
   _count: {
     orders: number;

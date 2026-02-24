@@ -7,7 +7,7 @@ import { auth } from "@/lib/auth";
 
 const reviewSchema = z.object({
   rating: z.coerce.number().int().min(1).max(5),
-  comment: z.string().optional(),
+  comment: z.string().max(2000, "Comment is too long").optional(),
 });
 
 export async function createReview(productId: string, formData: FormData) {
