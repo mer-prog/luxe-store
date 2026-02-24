@@ -27,7 +27,7 @@ Most portfolio e-commerce apps stop at "add to cart." LUXE goes further — it i
 - **Transactional email delivery** via Resend on payment confirmation
 - **Role-based access control** with middleware-level route protection
 - **Full admin back-office** with KPI dashboards and order lifecycle management
-- **Security hardening** with HSTS, CSP, clickjacking protection, and bcrypt password hashing
+- **Security hardening** with HSTS, clickjacking protection, strict referrer policy, and bcrypt password hashing
 
 ---
 
