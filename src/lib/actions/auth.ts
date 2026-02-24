@@ -8,8 +8,13 @@ import { AuthError } from "next-auth";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100, "Name is too long"),
-  email: z.string().email("Invalid email address").max(255, "Email is too long"),
-  password: z.string().min(6, "Password must be at least 6 characters").max(128, "Password is too long"),
+  email: z.string().email("Invalid email address").max(254, "Email is too long"),
+  password: z.string().min(8, "Password must be at least 8 characters").max(128, "Password is too long"),
+});
+
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address").max(254),
+  password: z.string().min(1, "Password is required").max(128),
 });
 
 export async function registerUser(formData: FormData) {
@@ -30,7 +35,7 @@ export async function registerUser(formData: FormData) {
   });
 
   if (existingUser) {
-    return { error: "An account with this email already exists" };
+    return { error: "Unable to create account. Please try a different email or sign in." };
   }
 
   const hashedPassword = await hash(password, 12);
@@ -59,17 +64,19 @@ export async function registerUser(formData: FormData) {
 }
 
 export async function loginUser(formData: FormData) {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+  const parsed = loginSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
 
-  if (!email || !password) {
-    return { error: "Email and password are required" };
+  if (!parsed.success) {
+    return { error: "Invalid email or password" };
   }
 
   try {
     await signIn("credentials", {
-      email,
-      password,
+      email: parsed.data.email,
+      password: parsed.data.password,
       redirect: false,
     });
     return { success: true };
