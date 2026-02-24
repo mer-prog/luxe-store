@@ -21,9 +21,9 @@ export async function POST(request: Request) {
       process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("Stripe webhook signature verification failed:", err instanceof Error ? err.message : err);
     return NextResponse.json(
-      { error: `Invalid signature: ${message}` },
+      { error: "Webhook signature verification failed" },
       { status: 400 }
     );
   }
@@ -127,7 +127,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         .join("\n");
 
       await getResend().emails.send({
-        from: "LUXE Store <onboarding@resend.dev>",
+        from: process.env.EMAIL_FROM || "LUXE Store <onboarding@resend.dev>",
         to: order.user.email,
         subject: `Order Confirmed - ${order.orderNumber}`,
         html: `
