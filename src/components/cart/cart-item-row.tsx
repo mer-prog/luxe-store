@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Minus, Plus, X } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { updateCartItem, removeCartItem } from "@/lib/actions/cart";
+import { useTranslations, useLocale } from "next-intl";
 import type { CartItem, Product } from "@/types";
 
 type CartItemWithProduct = CartItem & { product: Product };
 
 export function CartItemRow({ item }: { item: CartItemWithProduct }) {
+  const t = useTranslations("cart");
+  const locale = useLocale();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -50,7 +53,7 @@ export function CartItemRow({ item }: { item: CartItemWithProduct }) {
         <div className="flex justify-between">
           <div>
             <h3 className="text-sm font-medium">{item.product.name}</h3>
-            <p className="mt-1 text-sm text-muted-foreground">Size: {item.size}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{t("sizeLabel", { size: item.size })}</p>
           </div>
           <Button
             variant="ghost"
@@ -87,7 +90,7 @@ export function CartItemRow({ item }: { item: CartItemWithProduct }) {
           </div>
 
           <span className="text-sm font-semibold">
-            {formatPrice(item.product.price * item.quantity)}
+            {formatPrice(item.product.price * item.quantity, locale)}
           </span>
         </div>
       </div>

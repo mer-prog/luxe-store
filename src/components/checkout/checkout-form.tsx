@@ -6,9 +6,13 @@ import { Separator } from "@/components/ui/separator";
 import { formatPrice } from "@/lib/utils";
 import { TAX_RATE } from "@/lib/constants";
 import { Lock } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
 import type { CartWithItems } from "@/types";
 
 export function CheckoutForm({ cart }: { cart: CartWithItems }) {
+  const t = useTranslations("checkout");
+  const tCart = useTranslations("cart");
+  const locale = useLocale();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -28,7 +32,7 @@ export function CheckoutForm({ cart }: { cart: CartWithItems }) {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Something went wrong");
+        setError(data.error || t("somethingWentWrong"));
         setLoading(false);
         return;
       }
@@ -36,7 +40,7 @@ export function CheckoutForm({ cart }: { cart: CartWithItems }) {
       // Redirect to Stripe Checkout
       window.location.href = data.url;
     } catch {
-      setError("Failed to connect to payment service");
+      setError(t("failedToConnect"));
       setLoading(false);
     }
   };
@@ -44,11 +48,10 @@ export function CheckoutForm({ cart }: { cart: CartWithItems }) {
   return (
     <div className="grid gap-10 lg:grid-cols-2">
       <div className="space-y-6">
-        <h2 className="font-serif text-2xl">Payment</h2>
+        <h2 className="font-serif text-2xl">{t("payment")}</h2>
 
         <p className="text-muted-foreground">
-          You will be redirected to Stripe to securely complete your payment and
-          enter shipping details.
+          {t("stripeRedirect")}
         </p>
 
         {error && (
@@ -64,16 +67,16 @@ export function CheckoutForm({ cart }: { cart: CartWithItems }) {
           size="lg"
         >
           <Lock className="mr-2 h-4 w-4" />
-          {loading ? "Redirecting..." : "Proceed to Payment"}
+          {loading ? t("redirecting") : t("proceedToPayment")}
         </Button>
 
         <p className="text-center text-xs text-muted-foreground">
-          Payments are processed securely by Stripe
+          {t("securePayment")}
         </p>
       </div>
 
       <div className="rounded-lg border bg-neutral-50 p-6">
-        <h2 className="font-serif text-lg">Order Summary</h2>
+        <h2 className="font-serif text-lg">{t("orderSummary")}</h2>
 
         <div className="mt-6 space-y-4">
           {cart.items.map((item) => (
@@ -81,30 +84,30 @@ export function CheckoutForm({ cart }: { cart: CartWithItems }) {
               <span>
                 {item.product.name} ({item.size}) x{item.quantity}
               </span>
-              <span>{formatPrice(item.product.price * item.quantity)}</span>
+              <span>{formatPrice(item.product.price * item.quantity, locale)}</span>
             </div>
           ))}
 
           <Separator />
 
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Subtotal</span>
-            <span>{formatPrice(subtotal)}</span>
+            <span className="text-muted-foreground">{tCart("subtotal")}</span>
+            <span>{formatPrice(subtotal, locale)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Tax (10%)</span>
-            <span>{formatPrice(tax)}</span>
+            <span className="text-muted-foreground">{tCart("tax")}</span>
+            <span>{formatPrice(tax, locale)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Shipping</span>
-            <span className="text-green-600">Free</span>
+            <span className="text-muted-foreground">{tCart("shipping")}</span>
+            <span className="text-green-600">{tCart("free")}</span>
           </div>
 
           <Separator />
 
           <div className="flex justify-between text-lg font-semibold">
-            <span>Total</span>
-            <span>{formatPrice(total)}</span>
+            <span>{tCart("total")}</span>
+            <span>{formatPrice(total, locale)}</span>
           </div>
         </div>
       </div>

@@ -8,12 +8,17 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { XCircle } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 export default async function CheckoutCancelPage() {
   const session = await auth();
   if (!session) redirect("/login");
 
-  const cartCount = await getCartCount();
+  const [cartCount, t, tCommon] = await Promise.all([
+    getCartCount(),
+    getTranslations("checkoutCancel"),
+    getTranslations("common"),
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -22,18 +27,17 @@ export default async function CheckoutCancelPage() {
       <main className="flex-1">
         <div className="mx-auto max-w-md py-20 text-center">
           <XCircle className="mx-auto h-16 w-16 text-red-500" />
-          <h1 className="mt-6 font-serif text-3xl">Payment Cancelled</h1>
+          <h1 className="mt-6 font-serif text-3xl">{t("title")}</h1>
           <p className="mt-4 text-muted-foreground">
-            Your payment was not processed and no charges were made. Your items
-            are reserved for a limited time.
+            {t("message")}
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Button asChild>
-              <Link href="/checkout">Try Again</Link>
+              <Link href="/checkout">{t("tryAgain")}</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/products">Continue Shopping</Link>
+              <Link href="/products">{tCommon("continueShopping")}</Link>
             </Button>
           </div>
         </div>
