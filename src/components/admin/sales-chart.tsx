@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslations, useLocale } from "next-intl";
 
 interface SalesData {
   month: string;
@@ -17,10 +18,24 @@ interface SalesData {
 }
 
 export function SalesChart({ data }: { data: SalesData[] }) {
+  const t = useTranslations("admin");
+  const locale = useLocale();
+
+  const currencySymbol = locale === "ja" ? "¥" : "$";
+  const formatValue = (v: number) =>
+    locale === "ja"
+      ? `¥${(v / 1000).toFixed(0)}k`
+      : `$${(v / 1000).toFixed(0)}k`;
+
+  const formatTooltip = (value: number) =>
+    locale === "ja"
+      ? [`¥${value.toLocaleString()}`, t("revenue")]
+      : [`$${value.toLocaleString()}`, t("revenue")];
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-sans text-base">Monthly Revenue</CardTitle>
+        <CardTitle className="font-sans text-base">{t("monthlyRevenue")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
@@ -35,10 +50,10 @@ export function SalesChart({ data }: { data: SalesData[] }) {
               <YAxis
                 className="text-xs"
                 tick={{ fontSize: 12 }}
-                tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                tickFormatter={formatValue}
               />
               <Tooltip
-                formatter={(value: number) => [`$${value.toLocaleString()}`, "Revenue"]}
+                formatter={formatTooltip}
                 contentStyle={{
                   backgroundColor: "white",
                   border: "1px solid #e5e5e5",

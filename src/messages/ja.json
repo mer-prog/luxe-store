@@ -204,7 +204,8 @@
     "joined": "登録日",
     "manageOrders": "注文ステータスの管理と更新",
     "viewCustomers": "顧客情報と注文履歴の確認",
-    "revenue": "売上"
+    "revenue": "売上",
+    "total": "合計"
   },
   "orderStatus": {
     "PENDING": "保留中",

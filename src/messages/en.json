@@ -204,7 +204,8 @@
     "joined": "Joined",
     "manageOrders": "Manage and update order statuses",
     "viewCustomers": "View customer details and order history",
-    "revenue": "Revenue"
+    "revenue": "Revenue",
+    "total": "Total"
   },
   "orderStatus": {
     "PENDING": "Pending",

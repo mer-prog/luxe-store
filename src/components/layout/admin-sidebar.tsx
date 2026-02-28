@@ -4,16 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Package, ShoppingCart, Users, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const sidebarLinks = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/products", label: "Products", icon: Package },
-  { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
-  { href: "/admin/customers", label: "Customers", icon: Users },
-];
+import { useTranslations } from "next-intl";
 
 export function AdminSidebar() {
+  const t = useTranslations("admin");
   const pathname = usePathname();
+
+  const sidebarLinks = [
+    { href: "/admin", label: t("dashboard"), icon: LayoutDashboard },
+    { href: "/admin/products", label: t("products"), icon: Package },
+    { href: "/admin/orders", label: t("orders"), icon: ShoppingCart },
+    { href: "/admin/customers", label: t("customers"), icon: Users },
+  ];
 
   return (
     <aside className="flex h-full w-64 flex-col border-r bg-neutral-50">
@@ -22,7 +24,7 @@ export function AdminSidebar() {
           LUXE
         </Link>
         <span className="ml-2 rounded bg-primary px-2 py-0.5 text-[10px] font-bold uppercase text-primary-foreground">
-          Admin
+          {t("admin")}
         </span>
       </div>
 
@@ -57,7 +59,7 @@ export function AdminSidebar() {
           className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Store
+          {t("backToStore")}
         </Link>
       </div>
     </aside>

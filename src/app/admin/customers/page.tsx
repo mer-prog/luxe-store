@@ -2,28 +2,32 @@ export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
 import { CustomerTable } from "@/components/admin/customer-table";
+import { getTranslations } from "next-intl/server";
 
 export default async function AdminCustomersPage() {
-  const customers = await prisma.user.findMany({
-    where: { role: "CUSTOMER" },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      createdAt: true,
-      orders: true,
-      _count: { select: { orders: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const [customers, t] = await Promise.all([
+    prisma.user.findMany({
+      where: { role: "CUSTOMER" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        orders: true,
+        _count: { select: { orders: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    getTranslations("admin"),
+  ]);
 
   return (
     <div>
       <div className="mb-6">
-        <h2 className="font-serif text-2xl">Customers</h2>
+        <h2 className="font-serif text-2xl">{t("customers")}</h2>
         <p className="mt-1 text-muted-foreground">
-          View customer details and order history
+          {t("viewCustomers")}
         </p>
       </div>
 

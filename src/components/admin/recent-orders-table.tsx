@@ -8,19 +8,23 @@ import {
 } from "@/components/ui/table";
 import { OrderStatusBadge } from "@/components/orders/order-status-badge";
 import { formatPrice, formatDate } from "@/lib/utils";
+import { getTranslations, getLocale } from "next-intl/server";
 import type { OrderWithUser } from "@/types";
 
-export function RecentOrdersTable({ orders }: { orders: OrderWithUser[] }) {
+export async function RecentOrdersTable({ orders }: { orders: OrderWithUser[] }) {
+  const t = await getTranslations("admin");
+  const locale = await getLocale();
+
   return (
     <div className="rounded-lg border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Order</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Total</TableHead>
+            <TableHead>{t("order")}</TableHead>
+            <TableHead>{t("customer")}</TableHead>
+            <TableHead>{t("date")}</TableHead>
+            <TableHead>{t("status")}</TableHead>
+            <TableHead className="text-right">{t("total")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -31,13 +35,13 @@ export function RecentOrdersTable({ orders }: { orders: OrderWithUser[] }) {
               </TableCell>
               <TableCell>{order.user.name}</TableCell>
               <TableCell className="text-sm">
-                {formatDate(order.createdAt)}
+                {formatDate(order.createdAt, locale)}
               </TableCell>
               <TableCell>
                 <OrderStatusBadge status={order.status} />
               </TableCell>
               <TableCell className="text-right font-medium">
-                {formatPrice(order.total)}
+                {formatPrice(order.total, locale)}
               </TableCell>
             </TableRow>
           ))}

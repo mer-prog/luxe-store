@@ -7,18 +7,22 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDate } from "@/lib/utils";
+import { getTranslations, getLocale } from "next-intl/server";
 import type { CustomerWithOrders } from "@/types";
 
-export function CustomerTable({ customers }: { customers: CustomerWithOrders[] }) {
+export async function CustomerTable({ customers }: { customers: CustomerWithOrders[] }) {
+  const t = await getTranslations("admin");
+  const locale = await getLocale();
+
   return (
     <div className="rounded-lg border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Joined</TableHead>
-            <TableHead>Orders</TableHead>
+            <TableHead>{t("name")}</TableHead>
+            <TableHead>{t("email")}</TableHead>
+            <TableHead>{t("joined")}</TableHead>
+            <TableHead>{t("orders")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -27,7 +31,7 @@ export function CustomerTable({ customers }: { customers: CustomerWithOrders[] }
               <TableCell className="font-medium">{customer.name}</TableCell>
               <TableCell>{customer.email}</TableCell>
               <TableCell className="text-sm">
-                {formatDate(customer.createdAt)}
+                {formatDate(customer.createdAt, locale)}
               </TableCell>
               <TableCell>{customer._count.orders}</TableCell>
             </TableRow>
