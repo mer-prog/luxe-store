@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { SizeSelector } from "./size-selector";
 import { addToCart } from "@/lib/actions/cart";
 import { ShoppingBag } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface AddToCartButtonProps {
   productId: string;
@@ -15,11 +16,13 @@ interface AddToCartButtonProps {
 }
 
 export function AddToCartButton({ productId, sizes, stock }: AddToCartButtonProps) {
+  const t = useTranslations("products");
   const { data: session } = useSession();
   const router = useRouter();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleAddToCart = async () => {
     if (!session) {
@@ -28,7 +31,8 @@ export function AddToCartButton({ productId, sizes, stock }: AddToCartButtonProp
     }
 
     if (!selectedSize) {
-      setMessage("Please select a size");
+      setMessage(t("selectSize"));
+      setIsSuccess(false);
       return;
     }
 
@@ -37,10 +41,12 @@ export function AddToCartButton({ productId, sizes, stock }: AddToCartButtonProp
 
     try {
       await addToCart(productId, selectedSize);
-      setMessage("Added to cart!");
+      setMessage(t("addedToCart"));
+      setIsSuccess(true);
       router.refresh();
     } catch {
-      setMessage("Failed to add to cart");
+      setMessage(t("failedToAdd"));
+      setIsSuccess(false);
     } finally {
       setLoading(false);
     }
@@ -61,13 +67,13 @@ export function AddToCartButton({ productId, sizes, stock }: AddToCartButtonProp
         size="lg"
       >
         <ShoppingBag className="mr-2 h-4 w-4" />
-        {stock === 0 ? "Out of Stock" : loading ? "Adding..." : "Add to Cart"}
+        {stock === 0 ? t("outOfStockButton") : loading ? t("adding") : t("addToCart")}
       </Button>
 
       {message && (
         <p
           className={`text-sm ${
-            message.includes("Added") ? "text-green-600" : "text-red-600"
+            isSuccess ? "text-green-600" : "text-red-600"
           }`}
         >
           {message}

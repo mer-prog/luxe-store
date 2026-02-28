@@ -9,9 +9,10 @@ import { PlaceholderImage } from "@/components/placeholder-image";
 import { Button } from "@/components/ui/button";
 import { getCartCount } from "@/lib/actions/cart";
 import { ArrowRight } from "lucide-react";
+import { getTranslations, getLocale } from "next-intl/server";
 
 export default async function HomePage() {
-  const [featuredProducts, categories, cartCount] = await Promise.all([
+  const [featuredProducts, categories, cartCount, t, locale] = await Promise.all([
     prisma.product.findMany({
       where: { featured: true },
       take: 8,
@@ -21,7 +22,11 @@ export default async function HomePage() {
       orderBy: { name: "asc" },
     }),
     getCartCount(),
+    getTranslations("home"),
+    getLocale(),
   ]);
+
+  const heroLines = t("heroTitle").split("\n");
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -33,19 +38,22 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-black/40" />
           <div className="relative z-10 text-center">
             <h1 className="font-serif text-5xl md:text-7xl tracking-wider">
-              Discover Timeless
-              <br />
-              Elegance
+              {heroLines.map((line, i) => (
+                <span key={i}>
+                  {line}
+                  {i < heroLines.length - 1 && <br />}
+                </span>
+              ))}
             </h1>
             <p className="mx-auto mt-6 max-w-md text-lg text-neutral-300">
-              Curated luxury fashion for the modern connoisseur
+              {t("heroSubtitle")}
             </p>
             <Button
               asChild
               size="lg"
               className="mt-8 h-12 px-8 uppercase tracking-widest"
             >
-              <Link href="/products">Shop Now</Link>
+              <Link href="/products">{t("shopNow")}</Link>
             </Button>
           </div>
         </section>
@@ -53,17 +61,17 @@ export default async function HomePage() {
         {/* Featured Products */}
         <section className="container py-20">
           <div className="flex items-center justify-between">
-            <h2 className="font-serif text-3xl">Featured Collection</h2>
+            <h2 className="font-serif text-3xl">{t("featuredCollection")}</h2>
             <Link
               href="/products"
               className="flex items-center gap-1 text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground"
             >
-              View All <ArrowRight className="h-4 w-4" />
+              {t("viewAll")} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
           <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 md:gap-6">
             {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} locale={locale} />
             ))}
           </div>
         </section>
@@ -71,7 +79,7 @@ export default async function HomePage() {
         {/* Categories */}
         <section className="bg-neutral-50 py-20">
           <div className="container">
-            <h2 className="text-center font-serif text-3xl">Shop by Category</h2>
+            <h2 className="text-center font-serif text-3xl">{t("shopByCategory")}</h2>
             <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5 md:gap-6">
               {categories.map((category) => (
                 <Link
@@ -99,12 +107,9 @@ export default async function HomePage() {
 
         {/* Brand Story */}
         <section className="container py-20 text-center">
-          <h2 className="font-serif text-3xl">The Art of Luxury</h2>
+          <h2 className="font-serif text-3xl">{t("artOfLuxury")}</h2>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            At LUXE, we believe in the power of exceptional craftsmanship. Every piece in our
-            collection is carefully curated from the world&apos;s finest ateliers, combining
-            traditional artistry with contemporary design. Experience fashion that transcends
-            seasons.
+            {t("brandStory")}
           </p>
         </section>
       </main>

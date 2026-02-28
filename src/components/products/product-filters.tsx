@@ -8,9 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 import type { Category } from "@/types";
 
 export function ProductFilters({ categories }: { categories: Category[] }) {
+  const t = useTranslations("products");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -31,10 +33,10 @@ export function ProductFilters({ categories }: { categories: Category[] }) {
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <Select value={currentCategory} onValueChange={(v) => updateParams("category", v)}>
         <SelectTrigger className="w-[200px]">
-          <SelectValue placeholder="All Categories" />
+          <SelectValue placeholder={t("allCategories")} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Categories</SelectItem>
+          <SelectItem value="all">{t("allCategories")}</SelectItem>
           {categories.map((cat) => (
             <SelectItem key={cat.id} value={cat.slug}>
               {cat.name}
@@ -45,12 +47,12 @@ export function ProductFilters({ categories }: { categories: Category[] }) {
 
       <Select value={currentSort} onValueChange={(v) => updateParams("sort", v)}>
         <SelectTrigger className="w-[200px]">
-          <SelectValue placeholder="Sort by" />
+          <SelectValue placeholder={t("newest")} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="newest">Newest</SelectItem>
-          <SelectItem value="price-asc">Price: Low to High</SelectItem>
-          <SelectItem value="price-desc">Price: High to Low</SelectItem>
+          <SelectItem value="newest">{t("newest")}</SelectItem>
+          <SelectItem value="price-asc">{t("priceLowToHigh")}</SelectItem>
+          <SelectItem value="price-desc">{t("priceHighToLow")}</SelectItem>
         </SelectContent>
       </Select>
     </div>
