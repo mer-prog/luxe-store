@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/footer";
 import { ProductGrid } from "@/components/products/product-grid";
 import { ProductFilters } from "@/components/products/product-filters";
 import { getCartCount } from "@/lib/actions/cart";
+import { getTranslations, getLocale } from "next-intl/server";
 import type { Prisma } from "@prisma/client";
 
 interface ProductsPageProps {
@@ -38,11 +39,19 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   if (sort === "price-asc") orderBy = { price: "asc" };
   if (sort === "price-desc") orderBy = { price: "desc" };
 
-  const [products, categories, cartCount] = await Promise.all([
+  const [products, categories, cartCount, t, locale] = await Promise.all([
     prisma.product.findMany({ where, orderBy }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
     getCartCount(),
+    getTranslations("products"),
+    getLocale(),
   ]);
+
+  const title = category
+    ? categories.find((c) => c.slug === category)?.name || t("allProducts")
+    : search
+    ? t("searchResults", { query: search })
+    : t("allProducts");
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -50,15 +59,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
       <main className="flex-1">
         <div className="container py-10">
-          <h1 className="font-serif text-4xl">
-            {category
-              ? categories.find((c) => c.slug === category)?.name || "Products"
-              : search
-              ? `Search: "${search}"`
-              : "All Products"}
-          </h1>
+          <h1 className="font-serif text-4xl">{title}</h1>
           <p className="mt-2 text-muted-foreground">
-            {products.length} {products.length === 1 ? "product" : "products"}
+            {t("productCount", { count: products.length })}
           </p>
 
           <div className="mt-8">
@@ -68,7 +71,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           </div>
 
           <div className="mt-8">
-            <ProductGrid products={products} />
+            <ProductGrid products={products} locale={locale} />
           </div>
         </div>
       </main>

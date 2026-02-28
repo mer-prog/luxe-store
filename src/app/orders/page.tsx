@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { OrderList } from "@/components/orders/order-list";
 import { getCartCount } from "@/lib/actions/cart";
+import { getTranslations } from "next-intl/server";
 
 export default async function OrdersPage() {
   const session = await auth();
@@ -14,7 +15,7 @@ export default async function OrdersPage() {
 
   const userId = (session.user as Record<string, unknown>).id as string;
 
-  const [orders, cartCount] = await Promise.all([
+  const [orders, cartCount, t] = await Promise.all([
     prisma.order.findMany({
       where: { userId },
       include: {
@@ -27,6 +28,7 @@ export default async function OrdersPage() {
       orderBy: { createdAt: "desc" },
     }),
     getCartCount(),
+    getTranslations("orders"),
   ]);
 
   return (
@@ -35,9 +37,9 @@ export default async function OrdersPage() {
 
       <main className="flex-1">
         <div className="container py-10">
-          <h1 className="font-serif text-4xl">Order History</h1>
+          <h1 className="font-serif text-4xl">{t("title")}</h1>
           <p className="mt-2 text-muted-foreground">
-            Track your orders and view past purchases
+            {t("subtitle")}
           </p>
 
           <div className="mt-8">

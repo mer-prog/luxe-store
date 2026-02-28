@@ -11,21 +11,25 @@ import {
 import { OrderStatusSelect } from "./order-status-select";
 import { PaymentStatusBadge } from "@/components/orders/payment-status-badge";
 import { formatPrice, formatDate } from "@/lib/utils";
+import { useTranslations, useLocale } from "next-intl";
 import type { OrderWithUser } from "@/types";
 
 export function OrderTable({ orders }: { orders: OrderWithUser[] }) {
+  const t = useTranslations("admin");
+  const locale = useLocale();
+
   return (
     <div className="rounded-lg border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Order</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Items</TableHead>
-            <TableHead>Total</TableHead>
-            <TableHead>Payment</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>{t("order")}</TableHead>
+            <TableHead>{t("customer")}</TableHead>
+            <TableHead>{t("date")}</TableHead>
+            <TableHead>{t("items")}</TableHead>
+            <TableHead>{t("total")}</TableHead>
+            <TableHead>{t("payment")}</TableHead>
+            <TableHead>{t("status")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -41,11 +45,11 @@ export function OrderTable({ orders }: { orders: OrderWithUser[] }) {
                 </div>
               </TableCell>
               <TableCell className="text-sm">
-                {formatDate(order.createdAt)}
+                {formatDate(order.createdAt, locale)}
               </TableCell>
-              <TableCell>{order.items.length} items</TableCell>
+              <TableCell>{t("itemsCount", { count: order.items.length })}</TableCell>
               <TableCell className="font-medium">
-                {formatPrice(order.total)}
+                {formatPrice(order.total, locale)}
               </TableCell>
               <TableCell>
                 <PaymentStatusBadge status={order.paymentStatus} />

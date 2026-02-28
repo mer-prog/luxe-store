@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginUser } from "@/lib/actions/auth";
+import { useTranslations } from "next-intl";
 
 export function LoginForm() {
+  const t = useTranslations("auth");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -32,32 +34,32 @@ export function LoginForm() {
   return (
     <div className="mx-auto w-full max-w-sm space-y-6">
       <div className="text-center">
-        <h1 className="font-serif text-3xl">Welcome Back</h1>
+        <h1 className="font-serif text-3xl">{t("welcomeBack")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Sign in to your LUXE account
+          {t("signInSubtitle")}
         </p>
       </div>
 
       <form action={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("email")}</Label>
           <Input
             id="email"
             name="email"
             type="email"
-            placeholder="your@email.com"
+            placeholder={t("emailPlaceholder")}
             required
             className="mt-1"
           />
         </div>
 
         <div>
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t("password")}</Label>
           <Input
             id="password"
             name="password"
             type="password"
-            placeholder="Enter your password"
+            placeholder={t("passwordPlaceholder")}
             required
             className="mt-1"
           />
@@ -66,14 +68,14 @@ export function LoginForm() {
         {error && <p className="text-sm text-red-600">{error}</p>}
 
         <Button type="submit" disabled={loading} className="w-full h-11 uppercase tracking-wider">
-          {loading ? "Signing in..." : "Sign In"}
+          {loading ? t("signingIn") : t("signIn")}
         </Button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
+        {t("noAccount")}{" "}
         <Link href="/register" className="text-primary hover:underline">
-          Create one
+          {t("createOne")}
         </Link>
       </p>
     </div>

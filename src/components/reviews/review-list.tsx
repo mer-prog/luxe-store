@@ -1,5 +1,6 @@
 import { Star } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { getTranslations, getLocale } from "next-intl/server";
 import type { Review, User } from "@/types";
 
 type ReviewWithUser = Review & { user: Pick<User, "id" | "name"> };
@@ -21,10 +22,13 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-export function ReviewList({ reviews }: { reviews: ReviewWithUser[] }) {
+export async function ReviewList({ reviews }: { reviews: ReviewWithUser[] }) {
+  const t = await getTranslations("reviews");
+  const locale = await getLocale();
+
   if (reviews.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">No reviews yet. Be the first to review!</p>
+      <p className="text-sm text-muted-foreground">{t("noReviews")}</p>
     );
   }
 
@@ -36,8 +40,7 @@ export function ReviewList({ reviews }: { reviews: ReviewWithUser[] }) {
       <div className="flex items-center gap-3">
         <StarRating rating={Math.round(averageRating)} />
         <span className="text-sm text-muted-foreground">
-          {averageRating.toFixed(1)} out of 5 ({reviews.length}{" "}
-          {reviews.length === 1 ? "review" : "reviews"})
+          {t("outOf5", { rating: averageRating.toFixed(1), count: reviews.length })}
         </span>
       </div>
 
@@ -50,7 +53,7 @@ export function ReviewList({ reviews }: { reviews: ReviewWithUser[] }) {
                 <StarRating rating={review.rating} />
               </div>
               <span className="text-xs text-muted-foreground">
-                {formatDate(review.createdAt)}
+                {formatDate(review.createdAt, locale)}
               </span>
             </div>
             {review.comment && (

@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface SizeSelectorProps {
   sizes: string[];
@@ -9,9 +10,11 @@ interface SizeSelectorProps {
 }
 
 export function SizeSelector({ sizes, selectedSize, onSelectSize }: SizeSelectorProps) {
+  const t = useTranslations("products");
+
   return (
     <div className="space-y-3">
-      <label className="text-sm font-medium">Size</label>
+      <label className="text-sm font-medium">{t("size")}</label>
       <div className="flex flex-wrap gap-2">
         {sizes.map((size) => (
           <button

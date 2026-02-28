@@ -7,29 +7,33 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Star } from "lucide-react";
 import { createReview } from "@/lib/actions/reviews";
+import { useTranslations } from "next-intl";
 
 export function ReviewForm({ productId }: { productId: string }) {
+  const t = useTranslations("reviews");
   const { data: session } = useSession();
   const router = useRouter();
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
 
   if (!session) {
     return (
       <p className="text-sm text-muted-foreground">
         <a href="/login" className="text-primary hover:underline">
-          Sign in
+          {t("signInLink")}
         </a>{" "}
-        to leave a review.
+        {t("signInToReview", { link: "" }).replace("", "")}
       </p>
     );
   }
 
   const handleSubmit = async (formData: FormData) => {
     if (rating === 0) {
-      setMessage("Please select a rating");
+      setMessage(t("selectRating"));
+      setIsSuccess(false);
       return;
     }
 
@@ -41,8 +45,10 @@ export function ReviewForm({ productId }: { productId: string }) {
 
     if (result.error) {
       setMessage(result.error);
+      setIsSuccess(false);
     } else {
-      setMessage("Review submitted!");
+      setMessage(t("submitted"));
+      setIsSuccess(true);
       setRating(0);
       router.refresh();
     }
@@ -52,7 +58,7 @@ export function ReviewForm({ productId }: { productId: string }) {
   return (
     <form action={handleSubmit} className="space-y-4">
       <div>
-        <label className="text-sm font-medium">Rating</label>
+        <label className="text-sm font-medium">{t("rating")}</label>
         <div className="mt-1 flex gap-1">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
@@ -76,12 +82,12 @@ export function ReviewForm({ productId }: { productId: string }) {
 
       <div>
         <label htmlFor="comment" className="text-sm font-medium">
-          Comment (optional)
+          {t("commentLabel")}
         </label>
         <Textarea
           id="comment"
           name="comment"
-          placeholder="Share your thoughts..."
+          placeholder={t("commentPlaceholder")}
           className="mt-1"
           rows={3}
         />
@@ -90,7 +96,7 @@ export function ReviewForm({ productId }: { productId: string }) {
       {message && (
         <p
           className={`text-sm ${
-            message.includes("submitted") ? "text-green-600" : "text-red-600"
+            isSuccess ? "text-green-600" : "text-red-600"
           }`}
         >
           {message}
@@ -98,7 +104,7 @@ export function ReviewForm({ productId }: { productId: string }) {
       )}
 
       <Button type="submit" disabled={loading} size="sm">
-        {loading ? "Submitting..." : "Submit Review"}
+        {loading ? t("submitting") : t("submitReview")}
       </Button>
     </form>
   );

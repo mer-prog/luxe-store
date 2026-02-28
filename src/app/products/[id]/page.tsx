@@ -11,6 +11,7 @@ import { ReviewList } from "@/components/reviews/review-list";
 import { ReviewForm } from "@/components/reviews/review-form";
 import { Separator } from "@/components/ui/separator";
 import { getCartCount } from "@/lib/actions/cart";
+import { getTranslations } from "next-intl/server";
 
 interface ProductPageProps {
   params: Promise<{ id: string }>;
@@ -18,6 +19,7 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params;
+  const t = await getTranslations("products");
 
   const [product, cartCount] = await Promise.all([
     prisma.product.findUnique({
@@ -60,14 +62,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <Separator className="my-16" />
 
           <div className="max-w-2xl">
-            <h2 className="font-serif text-2xl">Customer Reviews</h2>
+            <h2 className="font-serif text-2xl">{t("customerReviews")}</h2>
             <div className="mt-6">
               <ReviewList reviews={product.reviews} />
             </div>
 
             <Separator className="my-8" />
 
-            <h3 className="font-serif text-xl">Write a Review</h3>
+            <h3 className="font-serif text-xl">{t("writeReview")}</h3>
             <div className="mt-4">
               <ReviewForm productId={product.id} />
             </div>

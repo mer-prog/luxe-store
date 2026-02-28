@@ -3,15 +3,19 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { OrderStatusBadge } from "./order-status-badge";
 import { PlaceholderImage } from "@/components/placeholder-image";
 import { formatPrice, formatDate } from "@/lib/utils";
+import { getTranslations, getLocale } from "next-intl/server";
 import type { OrderWithItems } from "@/types";
 
-export function OrderList({ orders }: { orders: OrderWithItems[] }) {
+export async function OrderList({ orders }: { orders: OrderWithItems[] }) {
+  const t = await getTranslations("orders");
+  const locale = await getLocale();
+
   if (orders.length === 0) {
     return (
       <div className="py-20 text-center">
-        <p className="text-lg text-muted-foreground">No orders yet.</p>
+        <p className="text-lg text-muted-foreground">{t("noOrders")}</p>
         <Link href="/products" className="mt-4 inline-block text-sm text-primary hover:underline">
-          Start shopping
+          {t("startShopping")}
         </Link>
       </div>
     );
@@ -24,7 +28,7 @@ export function OrderList({ orders }: { orders: OrderWithItems[] }) {
           <CardHeader className="flex-row items-center justify-between space-y-0 pb-4">
             <div>
               <p className="text-sm text-muted-foreground">
-                {formatDate(order.createdAt)}
+                {formatDate(order.createdAt, locale)}
               </p>
               <p className="mt-1 font-mono text-xs text-muted-foreground">
                 {order.orderNumber || order.id}
@@ -32,7 +36,7 @@ export function OrderList({ orders }: { orders: OrderWithItems[] }) {
             </div>
             <div className="flex items-center gap-4">
               <OrderStatusBadge status={order.status} />
-              <span className="font-semibold">{formatPrice(order.total)}</span>
+              <span className="font-semibold">{formatPrice(order.total, locale)}</span>
             </div>
           </CardHeader>
           <CardContent>
@@ -50,7 +54,7 @@ export function OrderList({ orders }: { orders: OrderWithItems[] }) {
                   <div>
                     <p className="text-sm font-medium">{item.product.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {item.size} &middot; Qty: {item.quantity}
+                      {item.size} &middot; {t("qty", { quantity: item.quantity })}
                     </p>
                   </div>
                 </div>

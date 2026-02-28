@@ -4,12 +4,13 @@ import { prisma } from "@/lib/prisma";
 import { KpiCards } from "@/components/admin/kpi-cards";
 import { SalesChart } from "@/components/admin/sales-chart";
 import { RecentOrdersTable } from "@/components/admin/recent-orders-table";
+import { getTranslations } from "next-intl/server";
 
 export default async function AdminDashboardPage() {
   const now = new Date();
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [orders, newCustomers, recentOrders] = await Promise.all([
+  const [orders, newCustomers, recentOrders, t] = await Promise.all([
     prisma.order.findMany({
       select: { total: true, createdAt: true },
     }),
@@ -31,6 +32,7 @@ export default async function AdminDashboardPage() {
         },
       },
     }),
+    getTranslations("admin"),
   ]);
 
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
@@ -67,9 +69,9 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-serif text-3xl">Dashboard</h1>
+        <h1 className="font-serif text-3xl">{t("dashboard")}</h1>
         <p className="mt-1 text-muted-foreground">
-          Overview of your store performance
+          {t("storePerformance")}
         </p>
       </div>
 
@@ -85,7 +87,7 @@ export default async function AdminDashboardPage() {
       <SalesChart data={salesChartData} />
 
       <div>
-        <h2 className="mb-4 font-serif text-xl">Recent Orders</h2>
+        <h2 className="mb-4 font-serif text-xl">{t("recentOrders")}</h2>
         <RecentOrdersTable orders={recentOrders} />
       </div>
     </div>

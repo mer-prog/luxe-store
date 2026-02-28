@@ -1,8 +1,12 @@
 import { formatPrice } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { getTranslations, getLocale } from "next-intl/server";
 import type { ProductWithCategory } from "@/types";
 
-export function ProductInfo({ product }: { product: ProductWithCategory }) {
+export async function ProductInfo({ product }: { product: ProductWithCategory }) {
+  const t = await getTranslations("products");
+  const locale = await getLocale();
+
   return (
     <div className="space-y-6">
       <div>
@@ -13,10 +17,10 @@ export function ProductInfo({ product }: { product: ProductWithCategory }) {
       </div>
 
       <div className="flex items-baseline gap-3">
-        <span className="text-2xl font-semibold">{formatPrice(product.price)}</span>
+        <span className="text-2xl font-semibold">{formatPrice(product.price, locale)}</span>
         {product.compareAtPrice && (
           <span className="text-lg text-muted-foreground line-through">
-            {formatPrice(product.compareAtPrice)}
+            {formatPrice(product.compareAtPrice, locale)}
           </span>
         )}
       </div>
@@ -25,9 +29,9 @@ export function ProductInfo({ product }: { product: ProductWithCategory }) {
 
       <div className="text-sm text-muted-foreground">
         {product.stock > 0 ? (
-          <span className="text-green-600">In stock ({product.stock} available)</span>
+          <span className="text-green-600">{t("inStock", { count: product.stock })}</span>
         ) : (
-          <span className="text-red-600">Out of stock</span>
+          <span className="text-red-600">{t("outOfStock")}</span>
         )}
       </div>
     </div>

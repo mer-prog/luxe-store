@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, ShoppingCart, TrendingUp, Users } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { getTranslations, getLocale } from "next-intl/server";
 
 interface KpiData {
   totalRevenue: number;
@@ -9,25 +10,28 @@ interface KpiData {
   newCustomers: number;
 }
 
-export function KpiCards({ data }: { data: KpiData }) {
+export async function KpiCards({ data }: { data: KpiData }) {
+  const t = await getTranslations("admin");
+  const locale = await getLocale();
+
   const kpis = [
     {
-      title: "Total Revenue",
-      value: formatPrice(data.totalRevenue),
+      title: t("totalRevenue"),
+      value: formatPrice(data.totalRevenue, locale),
       icon: DollarSign,
     },
     {
-      title: "Total Orders",
+      title: t("totalOrders"),
       value: data.totalOrders.toString(),
       icon: ShoppingCart,
     },
     {
-      title: "Avg Order Value",
-      value: formatPrice(data.avgOrderValue),
+      title: t("avgOrderValue"),
+      value: formatPrice(data.avgOrderValue, locale),
       icon: TrendingUp,
     },
     {
-      title: "New Customers",
+      title: t("newCustomers"),
       value: data.newCustomers.toString(),
       icon: Users,
     },

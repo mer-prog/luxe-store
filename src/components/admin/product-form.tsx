@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createProduct, updateProduct } from "@/lib/actions/products";
+import { useTranslations } from "next-intl";
 import type { Product, Category } from "@/types";
 
 interface ProductFormProps {
@@ -23,6 +24,7 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ product, categories, onSuccess }: ProductFormProps) {
+  const t = useTranslations("admin");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -53,7 +55,7 @@ export function ProductForm({ product, categories, onSuccess }: ProductFormProps
     <form action={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="name">{t("name")}</Label>
           <Input
             id="name"
             name="name"
@@ -63,7 +65,7 @@ export function ProductForm({ product, categories, onSuccess }: ProductFormProps
           />
         </div>
         <div>
-          <Label htmlFor="slug">Slug</Label>
+          <Label htmlFor="slug">{t("slug")}</Label>
           <Input
             id="slug"
             name="slug"
@@ -75,7 +77,7 @@ export function ProductForm({ product, categories, onSuccess }: ProductFormProps
       </div>
 
       <div>
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">{t("description")}</Label>
         <Textarea
           id="description"
           name="description"
@@ -88,7 +90,7 @@ export function ProductForm({ product, categories, onSuccess }: ProductFormProps
 
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <Label htmlFor="price">Price ($)</Label>
+          <Label htmlFor="price">{t("price")}</Label>
           <Input
             id="price"
             name="price"
@@ -100,7 +102,7 @@ export function ProductForm({ product, categories, onSuccess }: ProductFormProps
           />
         </div>
         <div>
-          <Label htmlFor="compareAtPrice">Compare At Price ($)</Label>
+          <Label htmlFor="compareAtPrice">{t("compareAtPrice")}</Label>
           <Input
             id="compareAtPrice"
             name="compareAtPrice"
@@ -111,7 +113,7 @@ export function ProductForm({ product, categories, onSuccess }: ProductFormProps
           />
         </div>
         <div>
-          <Label htmlFor="stock">Stock</Label>
+          <Label htmlFor="stock">{t("stock")}</Label>
           <Input
             id="stock"
             name="stock"
@@ -125,10 +127,10 @@ export function ProductForm({ product, categories, onSuccess }: ProductFormProps
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label>Category</Label>
+          <Label>{t("category")}</Label>
           <Select value={categoryId} onValueChange={setCategoryId}>
             <SelectTrigger className="mt-1">
-              <SelectValue placeholder="Select category" />
+              <SelectValue placeholder={t("selectCategory")} />
             </SelectTrigger>
             <SelectContent>
               {categories.map((cat) => (
@@ -140,7 +142,7 @@ export function ProductForm({ product, categories, onSuccess }: ProductFormProps
           </Select>
         </div>
         <div>
-          <Label htmlFor="sizes">Sizes (comma-separated)</Label>
+          <Label htmlFor="sizes">{t("sizes")}</Label>
           <Input
             id="sizes"
             name="sizes"
@@ -153,7 +155,7 @@ export function ProductForm({ product, categories, onSuccess }: ProductFormProps
       </div>
 
       <div>
-        <Label htmlFor="images">Image URLs (comma-separated)</Label>
+        <Label htmlFor="images">{t("imageUrls")}</Label>
         <Input
           id="images"
           name="images"
@@ -173,7 +175,7 @@ export function ProductForm({ product, categories, onSuccess }: ProductFormProps
           className="h-4 w-4"
         />
         <Label htmlFor="featured" className="font-normal">
-          Featured product
+          {t("featuredProduct")}
         </Label>
       </div>
 
@@ -182,11 +184,11 @@ export function ProductForm({ product, categories, onSuccess }: ProductFormProps
       <Button type="submit" disabled={loading} className="w-full">
         {loading
           ? product
-            ? "Updating..."
-            : "Creating..."
+            ? t("updating")
+            : t("creating")
           : product
-          ? "Update Product"
-          : "Create Product"}
+          ? t("updateProduct")
+          : t("createProduct")}
       </Button>
     </form>
   );

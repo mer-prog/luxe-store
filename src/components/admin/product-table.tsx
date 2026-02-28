@@ -24,6 +24,7 @@ import { ProductForm } from "./product-form";
 import { deleteProduct } from "@/lib/actions/products";
 import { formatPrice } from "@/lib/utils";
 import { Pencil, Trash2, Plus } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
 import type { ProductWithCategory, Category } from "@/types";
 
 interface ProductTableProps {
@@ -32,13 +33,15 @@ interface ProductTableProps {
 }
 
 export function ProductTable({ products, categories }: ProductTableProps) {
+  const t = useTranslations("admin");
+  const locale = useLocale();
   const router = useRouter();
   const [editProduct, setEditProduct] = useState<ProductWithCategory | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
+    if (!confirm(t("deleteConfirm"))) return;
     setDeletingId(id);
     await deleteProduct(id);
     router.refresh();
@@ -48,17 +51,17 @@ export function ProductTable({ products, categories }: ProductTableProps) {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="font-serif text-2xl">Products</h2>
+        <h2 className="font-serif text-2xl">{t("products")}</h2>
         <Dialog open={showAdd} onOpenChange={setShowAdd}>
           <DialogTrigger asChild>
             <Button>
-              <Plus className="mr-2 h-4 w-4" /> Add Product
+              <Plus className="mr-2 h-4 w-4" /> {t("addProduct")}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Add Product</DialogTitle>
-              <DialogDescription>Create a new product in the catalog.</DialogDescription>
+              <DialogTitle>{t("addProductTitle")}</DialogTitle>
+              <DialogDescription>{t("addProductDescription")}</DialogDescription>
             </DialogHeader>
             <ProductForm
               categories={categories}
@@ -72,12 +75,12 @@ export function ProductTable({ products, categories }: ProductTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Stock</TableHead>
-              <TableHead>Featured</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t("name")}</TableHead>
+              <TableHead>{t("category")}</TableHead>
+              <TableHead>{t("price")}</TableHead>
+              <TableHead>{t("stock")}</TableHead>
+              <TableHead>{t("featured")}</TableHead>
+              <TableHead className="text-right">{t("actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -85,11 +88,11 @@ export function ProductTable({ products, categories }: ProductTableProps) {
               <TableRow key={product.id}>
                 <TableCell className="font-medium">{product.name}</TableCell>
                 <TableCell>{product.category.name}</TableCell>
-                <TableCell>{formatPrice(product.price)}</TableCell>
+                <TableCell>{formatPrice(product.price, locale)}</TableCell>
                 <TableCell>{product.stock}</TableCell>
                 <TableCell>
                   {product.featured && (
-                    <Badge variant="secondary">Featured</Badge>
+                    <Badge variant="secondary">{t("featured")}</Badge>
                   )}
                 </TableCell>
                 <TableCell className="text-right">
@@ -107,8 +110,8 @@ export function ProductTable({ products, categories }: ProductTableProps) {
                       </DialogTrigger>
                       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
-                          <DialogTitle>Edit Product</DialogTitle>
-                          <DialogDescription>Update product details.</DialogDescription>
+                          <DialogTitle>{t("editProduct")}</DialogTitle>
+                          <DialogDescription>{t("editProductDescription")}</DialogDescription>
                         </DialogHeader>
                         <ProductForm
                           product={product}

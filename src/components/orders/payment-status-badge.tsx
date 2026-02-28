@@ -1,7 +1,10 @@
 import { cn } from "@/lib/utils";
-import { PAYMENT_STATUS_LABELS, PAYMENT_STATUS_COLORS } from "@/lib/constants";
+import { PAYMENT_STATUS_COLORS } from "@/lib/constants";
+import { getTranslations } from "next-intl/server";
 
-export function PaymentStatusBadge({ status }: { status: string }) {
+export async function PaymentStatusBadge({ status }: { status: string }) {
+  const t = await getTranslations("paymentStatus");
+
   return (
     <span
       className={cn(
@@ -9,7 +12,7 @@ export function PaymentStatusBadge({ status }: { status: string }) {
         PAYMENT_STATUS_COLORS[status] || "bg-gray-100 text-gray-800"
       )}
     >
-      {PAYMENT_STATUS_LABELS[status] || status}
+      {t(status as "PENDING" | "PAID" | "FAILED" | "REFUNDED" | "EXPIRED")}
     </span>
   );
 }

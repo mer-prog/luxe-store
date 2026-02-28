@@ -14,22 +14,25 @@ import {
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/products", label: "Shop" },
-  { href: "/products?category=outerwear", label: "Outerwear" },
-  { href: "/products?category=tops", label: "Tops" },
-  { href: "/products?category=shoes", label: "Shoes" },
-];
+import { useTranslations } from "next-intl";
+import { LanguageToggle } from "./language-toggle";
 
 export function Header({ cartCount = 0 }: { cartCount?: number }) {
+  const t = useTranslations("nav");
   const { data: session } = useSession();
   const router = useRouter();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const isAdmin = (session?.user as Record<string, unknown>)?.role === "ADMIN";
+
+  const navLinks = [
+    { href: "/", label: t("home") },
+    { href: "/products", label: t("shop") },
+    { href: "/products?category=outerwear", label: t("outerwear") },
+    { href: "/products?category=tops", label: t("tops") },
+    { href: "/products?category=shoes", label: t("shoes") },
+  ];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +51,7 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="icon">
               <Menu className="h-5 w-5" />
-              <span className="sr-only">Menu</span>
+              <span className="sr-only">{t("menu")}</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
@@ -93,7 +96,7 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
             <form onSubmit={handleSearch} className="flex items-center">
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder={t("searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-9 w-40 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
@@ -106,9 +109,12 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
           ) : (
             <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)}>
               <Search className="h-5 w-5" />
-              <span className="sr-only">Search</span>
+              <span className="sr-only">{t("search")}</span>
             </Button>
           )}
+
+          {/* Language toggle */}
+          <LanguageToggle />
 
           {/* Cart */}
           <Link href="/cart">
@@ -119,7 +125,7 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
                   {cartCount}
                 </span>
               )}
-              <span className="sr-only">Cart</span>
+              <span className="sr-only">{t("cart")}</span>
             </Button>
           </Link>
 
@@ -129,7 +135,7 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <User className="h-5 w-5" />
-                  <span className="sr-only">Account</span>
+                  <span className="sr-only">{t("account")}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -140,14 +146,14 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
                 <DropdownMenuItem asChild>
                   <Link href="/orders" className="cursor-pointer">
                     <Package className="mr-2 h-4 w-4" />
-                    Orders
+                    {t("orders")}
                   </Link>
                 </DropdownMenuItem>
                 {isAdmin && (
                   <DropdownMenuItem asChild>
                     <Link href="/admin" className="cursor-pointer">
                       <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Admin Dashboard
+                      {t("adminDashboard")}
                     </Link>
                   </DropdownMenuItem>
                 )}
@@ -157,14 +163,14 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
                   onClick={() => signOut({ callbackUrl: "/" })}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  Sign Out
+                  {t("signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Link href="/login">
               <Button variant="ghost" size="sm" className="text-sm">
-                Sign In
+                {t("signIn")}
               </Button>
             </Link>
           )}

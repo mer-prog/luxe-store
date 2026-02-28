@@ -10,7 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { updateOrderStatus } from "@/lib/actions/orders";
-import { ORDER_STATUSES, ORDER_STATUS_LABELS } from "@/lib/constants";
+import { ORDER_STATUSES } from "@/lib/constants";
+import { useTranslations } from "next-intl";
 import type { OrderStatus } from "@prisma/client";
 
 interface OrderStatusSelectProps {
@@ -19,6 +20,7 @@ interface OrderStatusSelectProps {
 }
 
 export function OrderStatusSelect({ orderId, currentStatus }: OrderStatusSelectProps) {
+  const t = useTranslations("orderStatus");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +39,7 @@ export function OrderStatusSelect({ orderId, currentStatus }: OrderStatusSelectP
       <SelectContent>
         {ORDER_STATUSES.map((status) => (
           <SelectItem key={status} value={status}>
-            {ORDER_STATUS_LABELS[status]}
+            {t(status)}
           </SelectItem>
         ))}
       </SelectContent>
