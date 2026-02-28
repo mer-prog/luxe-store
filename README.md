@@ -28,6 +28,7 @@ Most portfolio e-commerce apps stop at "add to cart." LUXE goes further — it i
 - **Role-based access control** with middleware-level route protection
 - **Full admin back-office** with KPI dashboards and order lifecycle management
 - **Security hardening** with HSTS, clickjacking protection, strict referrer policy, and bcrypt password hashing
+- **Multilingual support (i18n)** — JP/EN language switching via next-intl with locale-linked currency formatting (¥ ↔ $) and cookie-based routing
 
 ---
 
@@ -45,6 +46,7 @@ Most portfolio e-commerce apps stop at "add to cart." LUXE goes further — it i
 | **Email** | Resend | Transactional order confirmation emails |
 | **Validation** | Zod | Runtime schema validation on forms & API inputs |
 | **Charts** | Recharts | Admin dashboard revenue visualization |
+| **i18n** | next-intl | JP/EN language switching, cookie-based locale, locale-aware currency formatting |
 | **Icons** | Lucide React | Consistent icon system |
 
 ---
@@ -171,6 +173,7 @@ erDiagram
 - **Stripe Checkout** — Redirect to hosted Stripe Checkout with shipping address collection
 - **Order History** — View past orders with status & payment badges
 - **Reviews** — Star rating (1-5) and optional text comments
+- **Multilingual (i18n)** — JP/EN toggle with locale-aware currency display (¥ ↔ $)
 
 ### Authentication & Authorization
 
@@ -207,6 +210,8 @@ Cart → POST /api/checkout → Stripe Checkout Session
                                     ↓
                         Redirect to /checkout/success
 ```
+
+**Language toggle affects currency display:** When the user switches between JP and EN, all price displays update (JP: ¥8,950 tax-included / EN: $89.50 + Tax). The underlying payment amount sent to Stripe remains unchanged — only the presentation layer adapts.
 
 **Edge cases handled:**
 - Session expiration (30 min) → stock restored, order cancelled
@@ -274,10 +279,19 @@ src/
 │   ├── reviews/                  # Review form & list
 │   └── ui/                       # shadcn/ui primitives (14 components)
 │
+├── i18n/
+│   ├── config.ts                 # Locale definitions (ja, en)
+│   └── request.ts                # next-intl request config (cookie-based)
+│
+├── messages/
+│   ├── ja.json                   # Japanese translations
+│   └── en.json                   # English translations
+│
 ├── lib/
 │   ├── actions/                  # Server Actions
 │   │   ├── auth.ts               # Register, login
 │   │   ├── cart.ts               # CRUD cart operations
+│   │   ├── locale.ts             # Language switching (setLocale)
 │   │   ├── orders.ts             # Order status updates
 │   │   ├── products.ts           # Product CRUD (admin)
 │   │   └── reviews.ts            # Create review
@@ -430,6 +444,8 @@ Open [http://localhost:3000](http://localhost:3000).
 | **Prisma over raw SQL** | Type-safe queries with generated types; schema-first migrations; serverless-compatible via Neon adapter |
 | **Prices stored in cents** | Avoids floating-point arithmetic errors; standard practice aligned with Stripe's API |
 | **Singleton pattern for clients** | Prevents connection exhaustion in serverless/development hot-reload environments |
+| **Locale-linked currency formatting** | Display currency switches with language (¥ ↔ $); payment logic (cent integers) remains unchanged. Standard pattern for international e-commerce |
+| **Cookie-based i18n (no URL prefix)** | Preserves product URL structure (`/products/[id]`). SEO matters for production EC but is unnecessary for a demo portfolio app |
 
 ---
 
