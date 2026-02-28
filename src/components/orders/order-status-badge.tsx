@@ -1,7 +1,10 @@
 import { cn } from "@/lib/utils";
-import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from "@/lib/constants";
+import { ORDER_STATUS_COLORS } from "@/lib/constants";
+import { getTranslations } from "next-intl/server";
 
-export function OrderStatusBadge({ status }: { status: string }) {
+export async function OrderStatusBadge({ status }: { status: string }) {
+  const t = await getTranslations("orderStatus");
+
   return (
     <span
       className={cn(
@@ -9,7 +12,7 @@ export function OrderStatusBadge({ status }: { status: string }) {
         ORDER_STATUS_COLORS[status] || "bg-gray-100 text-gray-800"
       )}
     >
-      {ORDER_STATUS_LABELS[status] || status}
+      {t(status as "PENDING" | "CONFIRMED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED")}
     </span>
   );
 }
