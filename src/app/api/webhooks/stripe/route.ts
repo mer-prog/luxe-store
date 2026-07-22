@@ -182,12 +182,21 @@ async function handleCheckoutExpired(session: Stripe.Checkout.Session) {
 }
 
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
-  // Find order by stripe payment ID
-  const order = await prisma.order.findFirst({
-    where: { stripePaymentId: paymentIntent.id },
+  // stripePaymentId is only persisted on checkout.session.completed, so a
+  // failed payment can never be found by it. Resolve the order through the
+  // Checkout Session that owns this PaymentIntent instead.
+  const sessions = await getStripe().checkout.sessions.list({
+    payment_intent: paymentIntent.id,
+    limit: 1,
   });
+  const orderId = sessions.data[0]?.metadata?.orderId;
+  if (!orderId) return;
 
+  const order = await prisma.order.findUnique({ where: { id: orderId } });
   if (order && order.paymentStatus !== "PAID") {
+    // Mark the failed attempt. Stock is NOT restored here: the Checkout
+    // Session is still open and the customer can retry payment. Stock is
+    // released by handleCheckoutExpired if the session ends unpaid.
     await prisma.order.update({
       where: { id: order.id },
       data: { paymentStatus: "FAILED" },
