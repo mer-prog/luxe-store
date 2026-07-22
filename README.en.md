@@ -214,7 +214,7 @@ Cart → POST /api/checkout
      ▼              ▼                     ▼
  completed      payment_failed        expired
      │              │                     │
-     ▼              ▼                     �▼
+     ▼              ▼                     ▼
  • Verify       • Resolve order       • Restore stock
    signature      via its Checkout    • Order CANCELLED
  • Idempotency    Session               / EXPIRED
