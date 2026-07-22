@@ -122,20 +122,47 @@ export async function POST() {
     });
   }
 
-  const checkoutSession = await getStripe().checkout.sessions.create({
-    mode: "payment",
-    line_items: lineItems,
-    shipping_address_collection: {
-      allowed_countries: ["US", "CA", "GB"],
-    },
-    metadata: {
-      orderId: order.id,
-      userId,
-    },
-    success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${appUrl}/checkout/cancel`,
-    expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // 30 minutes
-  });
+  let checkoutSession;
+  try {
+    checkoutSession = await getStripe().checkout.sessions.create({
+      mode: "payment",
+      line_items: lineItems,
+      shipping_address_collection: {
+        allowed_countries: ["US", "CA", "GB"],
+      },
+      metadata: {
+        orderId: order.id,
+        userId,
+      },
+      success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}/checkout/cancel`,
+      expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // 30 minutes
+    });
+  } catch (err) {
+    // Compensating transaction: no Stripe session exists, so no webhook
+    // (completed/expired) will ever reference this order. Release the
+    // reserved stock and cancel the order here, or the stock leaks.
+    await prisma.$transaction(async (tx) => {
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { increment: item.quantity } },
+        });
+      }
+      await tx.order.update({
+        where: { id: order.id },
+        data: { status: "CANCELLED", paymentStatus: "FAILED" },
+      });
+    });
+    console.error(
+      "Stripe checkout session creation failed:",
+      err instanceof Error ? err.message : err
+    );
+    return NextResponse.json(
+      { error: "Failed to create checkout session" },
+      { status: 502 }
+    );
+  }
 
   // Save Stripe session ID to order
   await prisma.order.update({
